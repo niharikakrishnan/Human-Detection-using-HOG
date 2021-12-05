@@ -1,23 +1,15 @@
-
 import sys
 from utils import *
 
+filename = "hog_feature.txt"
+cell_size = 8
+step_size = 8
+bins = 9
+block_size = 16
+
 path = sys.argv[1]
 img = loadImage(path)
-
-gradients = compute_gradients(img)
-
-print(img.shape)
-print(gradients.shape)
-
-plt.imshow(gradients, cmap='gray')
-plt.show()
-
-#angles = compute_gradient_angles(img)
-
-#bins = update_bins(gradients, angles)
-
-# Cells
-
-grid = [[1 for j in range(16)] for i in range(16)]
-
+gradient_magnitude, horizontal_gradient, vertical_gradient = compute_gradients(img)
+gradient_angle = compute_gradient_angles(vertical_gradient, horizontal_gradient)
+hog_vector = compute_hog_feature(gradient_magnitude, gradient_angle, cell_size, step_size, block_size, bins)
+write_hog_feature(filename, hog_vector)
