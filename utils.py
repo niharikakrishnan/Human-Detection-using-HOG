@@ -3,12 +3,24 @@ import matplotlib.image as mpimg
 import numpy as np
 import cv2
 import math
+import os
+
+def load_images_from_folder(path):
+    images, filenames, labels = [], [], ["Pos", "Neg"]
+    for label in labels:
+        folder = path + "/" + label
+        for filename in os.listdir(folder):
+            img = loadImage(os.path.join(folder,filename))
+            if img is not None:
+                images.append(img)
+                filenames.append([filename,label])
+    return images,filenames
 
 def loadImage(path):
     img = mpimg.imread(path)
     R, G, B = img[:,:,0], img[:,:,1], img[:,:,2]
     imgGray = np.round(0.299 * R + 0.5870 * G + 0.1140 * B)
-    #cv2.imwrite("image.bmp",imgGray)
+    #cv2.imwrite(path,imgGray)
     #plt.imshow(imgGray)
     #plt.show()
     return imgGray
@@ -135,7 +147,6 @@ def compute_hog_feature(gradients, angles, cell_size, step_size, block_size, bin
     #Converting cell-array list to 20 X 12 X 9 ndarray
     cell_histogram_list = np.reshape(cell_histogram_list,(cell_rows, cell_cols, bins))
 
-    print("Starting Block Normalization")
     #Normalizing Block
     block_step_size = int(block_size/cell_size)
     block_row = int(cell_rows - block_step_size + 1)
@@ -147,15 +158,15 @@ def compute_hog_feature(gradients, angles, cell_size, step_size, block_size, bin
         flag_col = 0
         for j in range(block_col):
             block_roi = cell_histogram_list[flag_row : flag_row+block_step_size, flag_col : flag_col+block_step_size] #Block Region of Interest
-            normalized_block_list = block_roi / (np.sqrt(np.sum(block_roi ** 2))) #L2 norm
+            normalized_block_list = block_roi / (np.sqrt(np.sum(block_roi ** 2) + 0.00005)) #L2 norm , adding 0.00005 to avoid division by 0
             normalized_block_list = normalized_block_list.flatten().tolist() #36X1 vector
             block_histogram_list += normalized_block_list
             flag_col += 1
         flag_row += 1
 
-    print(len(block_histogram_list))
     return block_histogram_list
 
 def write_hog_feature(filename, hog_feature):
     print("Saved file to " + filename)
     np.savetxt(filename, hog_feature)
+ 
