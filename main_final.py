@@ -2,7 +2,7 @@
 # Run the program: python main.py "Filepath/Human-Detection-using-HOG" "train"
 # Run the program: python main.py "Filepath/Human-Detection-using-HOG" "test"
 
-from utils_done import *
+from utils_final import *
 import sys
 
 # Takes in input as argument from the user
